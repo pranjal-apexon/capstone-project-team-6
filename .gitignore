@@ -1,0 +1,39 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / JetBrains
+.idea/
+
+# VS Code
+.vscode/
+
+# NuGet packages (restored automatically via dotnet restore)
+packages/
+*.nupkg
+*.snupkg
+
+# EF Core migrations snapshot (keep .cs migration files, ignore designer bloat)
+# Do NOT ignore Migrations/ — you want those committed
+
+# Environment-specific secrets — NEVER commit these
+appsettings.Production.json
+appsettings.Secrets.json
+secrets.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test results
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
