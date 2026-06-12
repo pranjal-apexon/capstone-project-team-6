@@ -1,158 +1,49 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import type { RootState, AppDispatch } from '../store/store';
-import { removeFromCart, updateCartQuantity, clearCart } from '../store/cartSlice';
-import Cart from '../components/Orders/Cart';
-import OrderHistory from '../components/Orders/OrderHistory';
-import type { Order } from '../types/order.types';
-import orderApi from '../api/orderApi';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import axios from 'axios';
+import type { RootState } from '../store/store';
+import OrderHistory from '../components/Orders/OrderHistory'; // Import your component
+import type { Order } from '../types/order.types'; // Import your type
 import '../components/styles/orders.css';
 
 const OrderPage: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { items, totalAmount } = useSelector((state: RootState) => state.cart);
+  const { user } = useSelector((state: RootState) => state.auth);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'cart' | 'history'>('cart');
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    if (activeTab === 'history') {
-      loadOrderHistory();
-    }
-  }, [activeTab]);
+    const fetchOrders = async () => {
+      try {
+        setLoading(true);
+        const url = user?.isAdmin ? '/api/orders' : '/api/orders/mine';
+        const token = localStorage.getItem('token');
+        
+        const response = await axios.get<Order[]>(`http://localhost:61800${url}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        console.log("API Response:", response.data); // Debugging line
+        setOrders(response.data);
+      } catch (err) {
+        console.error("Failed to fetch orders", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const loadOrderHistory = async () => {
-    try {
-      setIsLoading(true);
-      const data = await orderApi.getMyOrders();
-      setOrders(data);
-    } catch (err: any) {
-      alert('Failed to load order history');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleRemoveFromCart = (productId: string) => {
-    dispatch(removeFromCart(productId));
-  };
-
-  const handleUpdateQuantity = (productId: string, quantity: number) => {
-    if (quantity > 0) {
-      dispatch(updateCartQuantity({ productId, quantity }));
-    }
-  };
-
-  const handleCheckout = async () => {
-    if (items.length === 0) {
-      alert('Cart is empty');
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      const orderData = {
-        orderItems: items.map((item) => ({
-          productId: item.productId,
-          quantity: item.quantity,
-        })),
-      };
-
-      const newOrder = await orderApi.create(orderData);
-      dispatch(clearCart());
-      setActiveTab('history');
-      await loadOrderHistory();
-      alert(`Order placed successfully! Order ID: ${newOrder.id.substring(0, 8)}`);
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to place order');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleViewOrderDetails = (order: Order) => {
-    setSelectedOrder(selectedOrder?.id === order.id ? null : order);
-  };
+    fetchOrders();
+  }, [user?.isAdmin]);
 
   return (
     <div className="page-container order-page">
-      <h1>Orders & Cart</h1>
+      <header className="order-page-header">
+        <h1>{user?.isAdmin ? "All System Orders" : "My Order History"}</h1>
+      </header>
 
-      <div className="tab-container">
-        <button
-          className={`tab ${activeTab === 'cart' ? 'active' : ''}`}
-          onClick={() => setActiveTab('cart')}
-        >
-          Shopping Cart ({items.length})
-        </button>
-        <button
-          className={`tab ${activeTab === 'history' ? 'active' : ''}`}
-          onClick={() => setActiveTab('history')}
-        >
-          Order History
-        </button>
-      </div>
-
-      <div className="tab-content">
-        {activeTab === 'cart' && (
-          <Cart
-            items={items}
-            totalAmount={totalAmount}
-            onRemoveItem={handleRemoveFromCart}
-            onUpdateQuantity={handleUpdateQuantity}
-            onCheckout={handleCheckout}
-            isLoading={isLoading}
-          />
-        )}
-
-        {activeTab === 'history' && (
-          <>
-            <OrderHistory
-              orders={orders}
-              isLoading={isLoading}
-              onViewDetails={handleViewOrderDetails}
-            />
-
-            {selectedOrder && (
-              <div className="order-detail-modal">
-                <div className="modal-content">
-                  <h3>Order Details</h3>
-                  <p>
-                    <strong>Order ID:</strong> {selectedOrder.id}
-                  </p>
-                  <p>
-                    <strong>Date:</strong> {new Date(selectedOrder.orderDate).toLocaleDateString()}
-                  </p>
-                  <p>
-                    <strong>Status:</strong> {selectedOrder.status}
-                  </p>
-                  <p>
-                    <strong>Total:</strong> ${selectedOrder.totalAmount.toFixed(2)}
-                  </p>
-
-                  <h4>Items:</h4>
-                  <ul>
-                    {selectedOrder.orderItems.map((item) => (
-                      <li key={item.id}>
-                        {item.product?.name} - Quantity: {item.quantity}, Price: $
-                        {item.unitPrice.toFixed(2)}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <button
-                    onClick={() => setSelectedOrder(null)}
-                    className="btn-secondary"
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+      <main className="order-page-content">
+        {/* Pass the state to your reusable component */}
+        <OrderHistory orders={orders} isLoading={loading} />
+      </main>
     </div>
   );
 };

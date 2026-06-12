@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react'; // Added useState
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store/store';
-import { setLoading, setError, setProducts } from '../store/productSlice';
+import { setLoading, setError, setProducts, setFilters } from '../store/productSlice';
 import { addToCart } from '../store/cartSlice';
 import ProductList from '../components/Products/ProductList';
 import ProductSearch from '../components/Products/ProductSearch';
@@ -13,14 +13,29 @@ const ProductsPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { products, isLoading, error, filters } = useSelector((state: RootState) => state.product);
 
+  // 🟢 State to manage the active toast message
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
   useEffect(() => {
+    // Load all products once on component mount
     loadProducts();
   }, []);
 
-  const loadProducts = async (appliedFilters?: ProductFilters) => {
+  // 🟢 Automatically clear the toast message after 3 seconds
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => {
+        setToastMessage(null);
+      }, 3000);
+
+      return () => clearTimeout(timer); // Cleanup timer if a new toast interrupts
+    }
+  }, [toastMessage]);
+
+  const loadProducts = async () => {
     try {
       dispatch(setLoading(true));
-      const data = await productApi.getAll(appliedFilters || filters);
+      const data = await productApi.getAll();
       dispatch(setProducts(data));
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Failed to load products';
@@ -30,8 +45,8 @@ const ProductsPage: React.FC = () => {
     }
   };
 
-  const handleFiltersChange = async (newFilters: ProductFilters) => {
-    await loadProducts(newFilters);
+  const handleFiltersChange = (newFilters: ProductFilters) => {
+    dispatch(setFilters(newFilters));
   };
 
   const handleAddToCart = (product: Product) => {
@@ -47,22 +62,63 @@ const ProductsPage: React.FC = () => {
         quantity: 1,
       })
     );
-    alert(`${product.name} added to cart!`);
+
+    // 🟢 Replace alert with custom toast trigger
+    setToastMessage(`${product.name} added to cart!`);
   };
+
+  // CLIENT-SIDE FILTERING LOGIC
+  const filteredProducts = (products || []).filter((product) => {
+    if (filters?.searchTerm) {
+      const term = filters.searchTerm.toLowerCase();
+      const matchesName = product.name?.toLowerCase().includes(term);
+      const matchesDescription = product.description?.toLowerCase().includes(term);
+
+      if (!matchesName && !matchesDescription) {
+        return false;
+      }
+    }
+
+    if (filters?.category && product.category !== filters.category) {
+      return false;
+    }
+
+    if (filters?.minPrice !== undefined && product.price < filters.minPrice) {
+      return false;
+    }
+
+    if (filters?.maxPrice !== undefined && product.price > filters.maxPrice) {
+      return false;
+    }
+
+    return true;
+  });
 
   return (
     <div className="page-container products-page">
-      <h1>Our Products</h1>
+      <h1 className="products-main-title">Our Products</h1>
+      <p className="products-count-subtitle">
+        {filteredProducts.length} of {(products || []).length} products
+      </p>
 
       {error && <div className="error-banner">{error}</div>}
 
       <ProductSearch onFiltersChange={handleFiltersChange} />
 
       <ProductList
-        products={products}
+        products={filteredProducts}
         onAddToCart={handleAddToCart}
         isLoading={isLoading}
       />
+
+      {/* 🟢 Toast Layout element added here */}
+      {toastMessage && (
+        <div className="custom-toast">
+          <span className="toast-icon">✓</span>
+          <span className="toast-text">{toastMessage}</span>
+          <button className="toast-close-btn" onClick={() => setToastMessage(null)}>×</button>
+        </div>
+      )}
     </div>
   );
 };

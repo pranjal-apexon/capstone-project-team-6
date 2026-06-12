@@ -6,6 +6,8 @@ import RegisterPage from './pages/RegisterPage'
 import ProductsPage from './pages/ProductsPage'
 import OrderPage from './pages/OrderPage'
 import AdminPage from './pages/AdminPage'
+import CartContainer from './components/Orders/CartContainer'
+import CheckoutPage from './pages/CheckoutPage'
 import './App.css'
 
 function App() {
@@ -45,6 +47,9 @@ function App() {
 
         <Route path="/" element={<Navigate to="/products" replace />} />
         <Route path="*" element={<Navigate to="/products" replace />} />
+
+        <Route path="/cart" element={<CartContainer />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
       </Routes>
     </Router>
   )

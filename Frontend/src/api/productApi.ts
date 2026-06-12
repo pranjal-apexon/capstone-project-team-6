@@ -1,45 +1,44 @@
+import axiosClient from "./axiosClient";
 import type {
   Product,
   CreateProductRequest,
   UpdateProductRequest,
   ProductFilters,
-} from '../types/product.types';
-import axiosClient from './axiosClient';
+} from "../types/product.types";
 
 export const productApi = {
-  getAll: async (filters?: ProductFilters): Promise<Product[]> => {
-    const params = new URLSearchParams();
-    if (filters?.searchTerm) params.append('searchTerm', filters.searchTerm);
-    if (filters?.category) params.append('category', filters.category);
-    if (filters?.minPrice) params.append('minPrice', filters.minPrice.toString());
-    if (filters?.maxPrice) params.append('maxPrice', filters.maxPrice.toString());
+  async getAll(filters?: ProductFilters): Promise<Product[]> {
+    const queryParams: Record<string, any> = {};
 
-    const response = await axiosClient.get<Product[]>('/products', { params });
-    return response.data;
+    if (filters) {
+      // 💡 Try changing "search" to "q" or "name" if "search" doesn't work
+      if (filters.searchTerm) queryParams.search = filters.searchTerm;
+      if (filters.category) queryParams.category = filters.category;
+      if (filters.minPrice !== undefined) queryParams.minPrice = filters.minPrice;
+      if (filters.maxPrice !== undefined) queryParams.maxPrice = filters.maxPrice;
+    }
+    const res = await axiosClient.get("/products", {
+      params: filters,
+    });
+
+    return res.data.items || res.data;
   },
 
-  getById: async (id: string): Promise<Product> => {
-    const response = await axiosClient.get<Product>(`/products/${id}`);
-    return response.data;
+  // ✅ ADD THIS
+  async create(data: CreateProductRequest): Promise<Product> {
+    const res = await axiosClient.post<Product>("/products", data);
+    return res.data;
   },
 
-  create: async (data: CreateProductRequest): Promise<Product> => {
-    const response = await axiosClient.post<Product>('/products', data);
-    return response.data;
+  // ✅ ADD THIS
+  async update(id: string, data: UpdateProductRequest): Promise<Product> {
+    const res = await axiosClient.put<Product>(`/products/${id}`, data);
+    return res.data;
   },
 
-  update: async (id: string, data: UpdateProductRequest): Promise<Product> => {
-    const response = await axiosClient.put<Product>(`/products/${id}`, data);
-    return response.data;
-  },
-
-  delete: async (id: string): Promise<void> => {
+  // ✅ ADD THIS
+  async delete(id: string): Promise<void> {
     await axiosClient.delete(`/products/${id}`);
-  },
-
-  getLowStockProducts: async (): Promise<Product[]> => {
-    const response = await axiosClient.get<Product[]>('/products/low-stock');
-    return response.data;
   },
 };
 

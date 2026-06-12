@@ -21,34 +21,44 @@ const ProductSearch: React.FC<ProductSearchProps> = ({
   const [localFilters, setLocalFilters] = useState<ProductFilters>(filters || {});
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newFilters = { ...localFilters, searchTerm: e.target.value };
-    setLocalFilters(newFilters);
+    setLocalFilters((prev) => ({ ...prev, searchTerm: e.target.value }));
   };
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newFilters = { ...localFilters, category: e.target.value || undefined };
-    setLocalFilters(newFilters);
+    const updated = { ...localFilters, category: e.target.value || undefined };
+    setLocalFilters(updated);
   };
 
   const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newFilters = {
-      ...localFilters,
+    setLocalFilters((prev) => ({
+      ...prev,
       minPrice: e.target.value ? parseFloat(e.target.value) : undefined,
-    };
-    setLocalFilters(newFilters);
+    }));
   };
 
   const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newFilters = {
-      ...localFilters,
+    setLocalFilters((prev) => ({
+      ...prev,
       maxPrice: e.target.value ? parseFloat(e.target.value) : undefined,
-    };
-    setLocalFilters(newFilters);
+    }));
   };
 
-  const handleApplyFilters = () => {
+  // ⚡ THE FIX: Explicitly intercepting the Enter keypress
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement | HTMLSelectElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Stop any bubble up or default actions
+      executeSearch();
+    }
+  };
+
+  const executeSearch = () => {
     dispatch(setFilters(localFilters));
     onFiltersChange(localFilters);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    executeSearch();
   };
 
   const handleClearFilters = () => {
@@ -59,24 +69,28 @@ const ProductSearch: React.FC<ProductSearchProps> = ({
   };
 
   return (
-    <div className="product-search">
-      <div className="search-container">
-        <input
-          type="text"
-          placeholder="Search products..."
-          value={localFilters.searchTerm || ''}
-          onChange={handleSearchChange}
-          className="search-input"
-        />
-      </div>
+    <form onSubmit={handleSubmit} className="product-search-panel">
+      <div className="search-filter-grid">
+        <div className="filter-group">
+          <label htmlFor="search">Search</label>
+          <input
+            id="search"
+            type="text"
+            placeholder="Search products..."
+            value={localFilters.searchTerm || ''}
+            onChange={handleSearchChange}
+            onKeyDown={handleKeyDown} /* 👈 Added */
+            className="search-input"
+          />
+        </div>
 
-      <div className="filters-container">
         <div className="filter-group">
           <label htmlFor="category">Category</label>
           <select
             id="category"
             value={localFilters.category || ''}
             onChange={handleCategoryChange}
+            onKeyDown={handleKeyDown} /* 👈 Added */
           >
             <option value="">All Categories</option>
             <option value="Electronics">Electronics</option>
@@ -88,45 +102,47 @@ const ProductSearch: React.FC<ProductSearchProps> = ({
         </div>
 
         <div className="filter-group">
-          <label htmlFor="minPrice">Min Price</label>
+          <label htmlFor="minPrice">Min price ($)</label>
           <input
             type="number"
             id="minPrice"
-            placeholder="Min"
-            value={localFilters.minPrice || ''}
+            placeholder="0"
+            value={localFilters.minPrice !== undefined ? localFilters.minPrice : ''}
             onChange={handleMinPriceChange}
+            onKeyDown={handleKeyDown} /* 👈 Added */
             min="0"
           />
         </div>
 
         <div className="filter-group">
-          <label htmlFor="maxPrice">Max Price</label>
+          <label htmlFor="maxPrice">Max price ($)</label>
           <input
-            type="number"
+            type="text"
             id="maxPrice"
-            placeholder="Max"
-            value={localFilters.maxPrice || ''}
+            placeholder="∞"
+            value={localFilters.maxPrice !== undefined ? localFilters.maxPrice : ''}
             onChange={handleMaxPriceChange}
-            min="0"
+            onKeyDown={handleKeyDown} /* 👈 Added */
           />
         </div>
-
-        <button onClick={handleApplyFilters} className="btn-primary">
-          Apply Filters
-        </button>
-        <button onClick={handleClearFilters} className="btn-secondary">
-          Clear Filters
-        </button>
       </div>
 
-      {isAdmin && onAddProduct && (
-        <div className="admin-actions">
-          <button onClick={onAddProduct} className="btn-primary">
+      <div className="search-buttons-row">
+        <button type="submit" className="btn-filter-apply">
+          Apply
+        </button>
+
+        <button type="button" onClick={handleClearFilters} className="btn-filter-clear">
+          Clear
+        </button>
+
+        {isAdmin && onAddProduct && (
+          <button type="button" onClick={onAddProduct} className="btn-filter-apply style-admin-add">
             + Add Product
           </button>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </form>
   );
 };
 
