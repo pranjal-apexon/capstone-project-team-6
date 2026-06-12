@@ -1,0 +1,178 @@
+.admin-page {
+  min-height: 100vh;
+}
+
+.admin-panel {
+  background: white;
+  border-radius: 8px;
+  padding: 30px;
+  margin-bottom: 30px;
+}
+
+.admin-panel h2 {
+  margin-top: 0;
+  color: #333;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 15px;
+}
+
+.low-stock-alert {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 30px;
+  color: #856404;
+}
+
+.low-stock-alert h3 {
+  margin-top: 0;
+  color: #856404;
+  font-size: 18px;
+}
+
+.low-stock-alert ul {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0 0;
+}
+
+.low-stock-alert li {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.low-stock-alert li:last-child {
+  border-bottom: none;
+}
+
+.btn-add-product {
+  margin-bottom: 20px;
+}
+
+.order-management-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.order-management-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.order-management-table thead {
+  background-color: #f5f5f5;
+}
+
+.order-management-table th {
+  padding: 15px;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #ddd;
+}
+
+.order-management-table td {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.order-management-table tbody tr {
+  transition: background-color 0.3s;
+}
+
+.order-management-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.order-management-table .expanded {
+  background-color: #f0f0f0;
+}
+
+.order-detail-row td {
+  padding: 20px !important;
+  background-color: #f9f9f9;
+}
+
+.order-detail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+.order-items h4,
+.status-update h4 {
+  margin-top: 0;
+  color: #333;
+}
+
+.order-items ul {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0 0;
+}
+
+.order-items li {
+  padding: 8px 0;
+  color: #555;
+  border-bottom: 1px solid #eee;
+}
+
+.order-items li:last-child {
+  border-bottom: none;
+}
+
+.status-update label {
+  display: block;
+  margin-bottom: 8px;
+  color: #555;
+  font-weight: 600;
+}
+
+.status-update select {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 100%;
+}
+
+.status-update select:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.btn-small {
+  background-color: #667eea;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.btn-small:hover {
+  background-color: #764ba2;
+}
+
+@media (max-width: 768px) {
+  .order-detail {
+    grid-template-columns: 1fr;
+  }
+
+  .order-management-table {
+    overflow-x: scroll;
+  }
+
+  .order-management-table table {
+    font-size: 14px;
+  }
+
+  .order-management-table th,
+  .order-management-table td {
+    padding: 10px;
+  }
+}
