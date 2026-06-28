@@ -1,38 +1,40 @@
-export interface OrderItem {
-  id: string;
-  orderId: string;
-  productId: string;
+export interface OrderItemDto {
+  productId: number;
+  productName: string;
   quantity: number;
   unitPrice: number;
-  product?: {
-    id: string;
-    name: string;
-    price: number;
-  };
+  subtotal?: number;
 }
 
 export interface Order {
-  id: string;
-  userId: string;
+  id: number;
+  userId: number;
+  userFullName?: string;
   status: string;
   totalAmount: number;
   orderDate: string;
-  orderItems: OrderItem[];
+  updatedAt?: string;
+  items: OrderItemDto[];
+}
+
+export interface OrderItem {
+  productId: string;
+  quantity: number;
 }
 
 export const OrderStatus = {
-  PENDING: 'Pending',
-  PROCESSING: 'Processing',
-  SHIPPED: 'Shipped',
-  DELIVERED: 'Delivered',
-  CANCELLED: 'Cancelled',
+  PENDING: "Pending",
+  PROCESSING: "Processing",
+  SHIPPED: "Shipped",
+  DELIVERED: "Delivered",
+  CANCELLED: "Cancelled",
 } as const;
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
 
 export interface CreateOrderRequest {
-  orderItems: {
-    productId: string;
+  items: {
+    productId: number;
     quantity: number;
   }[];
 }

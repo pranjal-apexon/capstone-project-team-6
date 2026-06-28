@@ -1,7 +1,7 @@
-import React from 'react';
-import type { Order } from '../../types/order.types';
-import OrderStatusBadge from './OrderStatusBadge';
-import '../styles/orders.css';
+import React from "react";
+import type { Order } from "../../types/order.types";
+import OrderStatusBadge from "./OrderStatusBadge";
+import "../styles/orders.css";
 
 interface OrderHistoryProps {
   orders: Order[];
@@ -9,7 +9,11 @@ interface OrderHistoryProps {
   onViewDetails?: (order: Order) => void;
 }
 
-const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading = false, onViewDetails }) => {
+const OrderHistory: React.FC<OrderHistoryProps> = ({
+  orders,
+  isLoading = false,
+  onViewDetails,
+}) => {
   if (isLoading) {
     return <div className="loading">Loading orders...</div>;
   }
@@ -40,16 +44,19 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading = false, 
         <tbody>
           {orders.map((order) => (
             <tr key={order.id}>
-              <td className="order-id">{order.id.substring(0, 8)}...</td>
+              <td className="order-id">#{order.id}</td>
               <td>{new Date(order.orderDate).toLocaleDateString()}</td>
               <td>${order.totalAmount.toFixed(2)}</td>
               <td>
                 <OrderStatusBadge status={order.status} />
               </td>
-              <td>{order.orderItems.length} item(s)</td>
+              <td>{order.items.length} item(s)</td>
               <td>
                 {onViewDetails && (
-                  <button onClick={() => onViewDetails(order)} className="btn-view">
+                  <button
+                    onClick={() => onViewDetails(order)}
+                    className="btn-view"
+                  >
                     View Details
                   </button>
                 )}

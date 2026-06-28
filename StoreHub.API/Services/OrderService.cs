@@ -25,7 +25,9 @@ public class OrderService : IOrderService
             throw new InvalidOperationException("Order must contain at least one item.");
 
         var order = new Order { UserId = userId };
+        var productsToUpdate = new List<Product>();
 
+        // First, validate all items and collect products to update
         foreach (var item in dto.Items)
         {
             var product = await _productRepo.GetByIdAsync(item.ProductId)
@@ -39,7 +41,7 @@ public class OrderService : IOrderService
                     $"Insufficient stock for '{product.Name}'. Available: {product.StockQuantity}, Requested: {item.Quantity}");
 
             product.StockQuantity -= item.Quantity;
-            await _productRepo.UpdateAsync(product);
+            productsToUpdate.Add(product);
 
             order.OrderItems.Add(new OrderItem
             {
@@ -47,6 +49,12 @@ public class OrderService : IOrderService
                 Quantity = item.Quantity,
                 UnitPrice = product.Price
             });
+        }
+
+        // Update all products
+        foreach (var product in productsToUpdate)
+        {
+            await _productRepo.UpdateAsync(product);
         }
 
         order.TotalAmount = order.OrderItems.Sum(i => i.Quantity * i.UnitPrice);

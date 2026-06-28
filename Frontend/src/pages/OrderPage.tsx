@@ -1,38 +1,48 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import axios from 'axios';
-import type { RootState } from '../store/store';
-import OrderHistory from '../components/Orders/OrderHistory'; // Import your component
-import type { Order } from '../types/order.types'; // Import your type
-import '../components/styles/orders.css';
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import type { RootState } from "../store/store";
+import { orderApi } from "../api/orderApi";
+import OrderHistory from "../components/Orders/OrderHistory"; // Import your component
+import type { Order } from "../types/order.types"; // Import your type
+import "../components/styles/orders.css";
 
 const OrderPage: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchOrders = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
-        const url = user?.isAdmin ? '/api/orders' : '/api/orders/mine';
-        const token = localStorage.getItem('token');
-        
-        const response = await axios.get<Order[]>(`http://localhost:61800${url}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        console.log("API Response:", response.data); // Debugging line
-        setOrders(response.data);
+        setError(null);
+
+        let fetchedOrders: Order[];
+        if (user.isAdmin) {
+          fetchedOrders = await orderApi.getAll();
+        } else {
+          fetchedOrders = await orderApi.getMyOrders();
+        }
+
+        console.log("Orders fetched:", fetchedOrders);
+        setOrders(fetchedOrders);
       } catch (err) {
-        console.error("Failed to fetch orders", err);
+        console.error("Failed to fetch orders:", err);
+        setError("Failed to load orders. Please try again.");
+        setOrders([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchOrders();
-  }, [user?.isAdmin]);
+  }, [user]);
 
   return (
     <div className="page-container order-page">
@@ -41,6 +51,26 @@ const OrderPage: React.FC = () => {
       </header>
 
       <main className="order-page-content">
+        {error && (
+          <div
+            style={{
+              padding: "12px",
+              marginBottom: "16px",
+              backgroundColor: "#fee",
+              border: "1px solid #f99",
+              borderRadius: "4px",
+              color: "#c33",
+            }}
+          >
+            {error}
+            <button
+              onClick={() => window.location.reload()}
+              style={{ marginLeft: "12px", cursor: "pointer" }}
+            >
+              Retry
+            </button>
+          </div>
+        )}
         {/* Pass the state to your reusable component */}
         <OrderHistory orders={orders} isLoading={loading} />
       </main>
