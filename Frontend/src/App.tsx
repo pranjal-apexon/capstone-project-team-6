@@ -1,14 +1,23 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import Navbar from './components/Layout/Navbar'
-import ProtectedRoute from './components/Layout/ProtectedRoute'
-import LoginPage from './pages/LoginPage'
-import RegisterPage from './pages/RegisterPage'
-import ProductsPage from './pages/ProductsPage'
-import OrderPage from './pages/OrderPage'
-import AdminPage from './pages/AdminPage'
-import CartContainer from './components/Orders/CartContainer'
-import CheckoutPage from './pages/CheckoutPage'
-import './App.css'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import Navbar from "./components/Layout/Navbar";
+import Footer from "./components/Layout/Footer";
+import ProtectedRoute from "./components/Layout/ProtectedRoute";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import HomePage from "./pages/HomePage";
+import ProductsPage from "./pages/ProductsPage";
+import ProductDetailsPage from "./pages/ProductDetailsPage";
+import OrderPage from "./pages/OrderPage";
+import OrderDetailsPage from "./pages/OrderDetailsPage";
+import AdminPage from "./pages/AdminPage";
+import CartContainer from "./components/Orders/CartContainer";
+import CheckoutPage from "./pages/CheckoutPage";
+import "./App.css";
 
 function App() {
   return (
@@ -28,10 +37,28 @@ function App() {
         />
 
         <Route
+          path="/products/:id"
+          element={
+            <ProtectedRoute>
+              <ProductDetailsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/orders"
           element={
             <ProtectedRoute>
               <OrderPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/orders/:id"
+          element={
+            <ProtectedRoute>
+              <OrderDetailsPage />
             </ProtectedRoute>
           }
         />
@@ -45,14 +72,15 @@ function App() {
           }
         />
 
-        <Route path="/" element={<Navigate to="/products" replace />} />
-        <Route path="*" element={<Navigate to="/products" replace />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
 
         <Route path="/cart" element={<CartContainer />} />
         <Route path="/checkout" element={<CheckoutPage />} />
       </Routes>
+      <Footer />
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;
