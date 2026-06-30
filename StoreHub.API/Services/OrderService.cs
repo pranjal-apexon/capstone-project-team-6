@@ -64,6 +64,17 @@ public class OrderService : IOrderService
         return _mapper.Map<OrderDto>(await _orderRepo.GetByIdAsync(created.Id));
     }
 
+    public async Task<OrderDto> GetByIdAsync(int orderId, int requestingUserId, bool isAdmin)
+    {
+        var order = await _orderRepo.GetByIdAsync(orderId)
+            ?? throw new KeyNotFoundException($"Order {orderId} not found.");
+
+        if (!isAdmin && order.UserId != requestingUserId)
+            throw new UnauthorizedAccessException("You do not have access to this order.");
+
+        return _mapper.Map<OrderDto>(order);
+    }
+
     public async Task<List<OrderDto>> GetMyOrdersAsync(int userId)
     {
         var orders = await _orderRepo.GetByUserIdAsync(userId);

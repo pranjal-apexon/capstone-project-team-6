@@ -1,11 +1,11 @@
-import React from 'react';
-import type { Product } from '../../types/product.types';
-import ProductCard from './ProductCard';
-import '../styles/products.css';
+import React from "react";
+import type { Product } from "../../types/product.types";
+import ProductCard from "./ProductCard";
+import "../styles/products.css";
 
 interface ProductListProps {
   products: Product[];
-  onAddToCart: (product: Product) => void;
+  onAddToCart: (product: Product, quantity: number) => void;
   onEdit?: (product: Product) => void;
   onDelete?: (id: string) => void;
   isAdmin?: boolean;
@@ -25,7 +25,11 @@ const ProductList: React.FC<ProductListProps> = ({
   }
 
   if (products.length === 0) {
-    return <div className="empty-state">No products found. Try adjusting your filters.</div>;
+    return (
+      <div className="empty-state">
+        No products found. Try adjusting your filters.
+      </div>
+    );
   }
 
   return (

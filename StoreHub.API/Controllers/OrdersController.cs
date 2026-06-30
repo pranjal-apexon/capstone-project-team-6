@@ -44,6 +44,17 @@ public class OrdersController : ControllerBase
         return Ok(orders);
     }
 
+    /// <summary>Get an order by id. Admin can access any order; users can access only their own.</summary>
+    [HttpGet("{id:int}")]
+    [ProducesResponseType(typeof(OrderDto), 200)]
+    [ProducesResponseType(typeof(ApiErrorDto), 404)]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var isAdmin = User.FindFirst("isAdmin")?.Value == "True";
+        var order = await _orderService.GetByIdAsync(id, GetUserId(), isAdmin);
+        return Ok(order);
+    }
+
     /// <summary>Update order status. Admin can set any status; user can only cancel their own order.</summary>
     [HttpPut("{id:int}/status")]
     [ProducesResponseType(typeof(OrderDto), 200)]

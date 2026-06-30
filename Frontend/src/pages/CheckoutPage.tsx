@@ -5,6 +5,7 @@ import type { RootState } from "../store/store";
 import { clearCart } from "../store/cartSlice";
 import { orderApi } from "../api/orderApi";
 import type { CreateOrderRequest } from "../types/order.types";
+import Breadcrumbs from "../components/Layout/Breadcrumbs";
 import "../components/styles/orders.css"; // Reusing your orders styles
 
 const CheckoutPage: React.FC = () => {
@@ -69,19 +70,28 @@ const CheckoutPage: React.FC = () => {
   // 1. Inline Success View
   if (isSuccess) {
     return (
-      <div className="cart-empty success-container">
-        <div className="success-icon">✓</div>
-        <h3>Order Placed Successfully!</h3>
-        <p>
-          Thank you for your purchase. Your order has been submitted and will
-          appear in your order history shortly.
-        </p>
-        <button
-          className="btn-filter-apply"
-          onClick={() => navigate("/orders")}
-        >
-          View Order History
-        </button>
+      <div className="page-container checkout-page-layout">
+        <Breadcrumbs
+          items={[
+            { label: "Home", to: "/" },
+            { label: "Cart", to: "/cart" },
+            { label: "Checkout" },
+          ]}
+        />
+        <div className="cart-empty success-container">
+          <div className="success-icon">✓</div>
+          <h3>Order Placed Successfully!</h3>
+          <p>
+            Thank you for your purchase. Your order has been submitted and will
+            appear in your order history shortly.
+          </p>
+          <button
+            className="btn-filter-apply"
+            onClick={() => navigate("/orders")}
+          >
+            View Order History
+          </button>
+        </div>
       </div>
     );
   }
@@ -89,12 +99,21 @@ const CheckoutPage: React.FC = () => {
   // 2. Fallback if they visit checkout with an empty cart
   if (items.length === 0) {
     return (
-      <div className="cart-empty">
-        <h3>Your checkout is empty</h3>
-        <p>Add some items to your cart before checking out.</p>
-        <button className="btn-filter-clear" onClick={() => navigate("/")}>
-          Go to Products
-        </button>
+      <div className="page-container checkout-page-layout">
+        <Breadcrumbs
+          items={[
+            { label: "Home", to: "/" },
+            { label: "Cart", to: "/cart" },
+            { label: "Checkout" },
+          ]}
+        />
+        <div className="cart-empty">
+          <h3>Your checkout is empty</h3>
+          <p>Add some items to your cart before checking out.</p>
+          <button className="btn-filter-clear" onClick={() => navigate("/")}>
+            Go to Products
+          </button>
+        </div>
       </div>
     );
   }
@@ -102,6 +121,14 @@ const CheckoutPage: React.FC = () => {
   // 3. Main Checkout Form Layout
   return (
     <div className="page-container checkout-page-layout">
+      <Breadcrumbs
+        items={[
+          { label: "Home", to: "/" },
+          { label: "Cart", to: "/cart" },
+          { label: "Checkout" },
+        ]}
+      />
+
       <h2>Checkout Details</h2>
 
       <div className="checkout-grid">

@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import type { Order } from '../../types/order.types';
-import { OrderStatus } from '../../types/order.types';
-import OrderStatusBadge from '../Orders/OrderStatusBadge';
-import '../styles/admin.css';
+import React, { useState } from "react";
+import type { Order } from "../../types/order.types";
+import { OrderStatus } from "../../types/order.types";
+import OrderStatusBadge from "../Orders/OrderStatusBadge";
+import "../styles/admin.css";
 
 interface AdminOrderPanelProps {
   orders: Order[];
-  onUpdateStatus: (orderId: string, status: OrderStatus) => void;
+  onUpdateStatus: (orderId: number, status: OrderStatus) => void;
   isLoading?: boolean;
 }
 
@@ -15,9 +15,9 @@ const AdminOrderPanel: React.FC<AdminOrderPanelProps> = ({
   onUpdateStatus,
   isLoading = false,
 }) => {
-  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+  const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null);
 
-  const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
+  const handleStatusChange = (orderId: number, newStatus: OrderStatus) => {
     onUpdateStatus(orderId, newStatus);
   };
 
@@ -43,9 +43,11 @@ const AdminOrderPanel: React.FC<AdminOrderPanelProps> = ({
             <tbody>
               {orders.map((order) => (
                 <React.Fragment key={order.id}>
-                  <tr className={expandedOrderId === order.id ? 'expanded' : ''}>
-                    <td>{order.id.substring(0, 8)}...</td>
-                    <td>{order.userId.substring(0, 8)}...</td>
+                  <tr
+                    className={expandedOrderId === order.id ? "expanded" : ""}
+                  >
+                    <td>{order.id}</td>
+                    <td>{order.userFullName || `User #${order.userId}`}</td>
                     <td>${order.totalAmount.toFixed(2)}</td>
                     <td>
                       <OrderStatusBadge status={order.status} />
@@ -55,12 +57,12 @@ const AdminOrderPanel: React.FC<AdminOrderPanelProps> = ({
                       <button
                         onClick={() =>
                           setExpandedOrderId(
-                            expandedOrderId === order.id ? null : order.id
+                            expandedOrderId === order.id ? null : order.id,
                           )
                         }
                         className="btn-small"
                       >
-                        {expandedOrderId === order.id ? 'Collapse' : 'Expand'}
+                        {expandedOrderId === order.id ? "Collapse" : "Expand"}
                       </button>
                     </td>
                   </tr>
@@ -72,9 +74,9 @@ const AdminOrderPanel: React.FC<AdminOrderPanelProps> = ({
                           <div className="order-items">
                             <h4>Items:</h4>
                             <ul>
-                              {order.orderItems.map((item) => (
-                                <li key={item.id}>
-                                  {item.product?.name} (Qty: {item.quantity}) - $
+                              {order.items.map((item) => (
+                                <li key={item.productId}>
+                                  {item.productName} (Qty: {item.quantity}) - $
                                   {item.unitPrice.toFixed(2)}
                                 </li>
                               ))}
@@ -82,20 +84,35 @@ const AdminOrderPanel: React.FC<AdminOrderPanelProps> = ({
                           </div>
 
                           <div className="status-update">
-                            <label htmlFor={`status-${order.id}`}>Update Status:</label>
+                            <label htmlFor={`status-${order.id}`}>
+                              Update Status:
+                            </label>
                             <select
                               id={`status-${order.id}`}
                               value={order.status}
                               onChange={(e) =>
-                                handleStatusChange(order.id, e.target.value as OrderStatus)
+                                handleStatusChange(
+                                  order.id,
+                                  e.target.value as OrderStatus,
+                                )
                               }
                               disabled={isLoading}
                             >
-                              <option value={OrderStatus.PENDING}>Pending</option>
-                              <option value={OrderStatus.PROCESSING}>Processing</option>
-                              <option value={OrderStatus.SHIPPED}>Shipped</option>
-                              <option value={OrderStatus.DELIVERED}>Delivered</option>
-                              <option value={OrderStatus.CANCELLED}>Cancelled</option>
+                              <option value={OrderStatus.PENDING}>
+                                Pending
+                              </option>
+                              <option value={OrderStatus.PROCESSING}>
+                                Processing
+                              </option>
+                              <option value={OrderStatus.SHIPPED}>
+                                Shipped
+                              </option>
+                              <option value={OrderStatus.DELIVERED}>
+                                Delivered
+                              </option>
+                              <option value={OrderStatus.CANCELLED}>
+                                Cancelled
+                              </option>
                             </select>
                           </div>
                         </div>

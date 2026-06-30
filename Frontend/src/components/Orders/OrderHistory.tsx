@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import type { Order } from "../../types/order.types";
 import OrderStatusBadge from "./OrderStatusBadge";
 import "../styles/orders.css";
@@ -6,13 +7,11 @@ import "../styles/orders.css";
 interface OrderHistoryProps {
   orders: Order[];
   isLoading?: boolean;
-  onViewDetails?: (order: Order) => void;
 }
 
 const OrderHistory: React.FC<OrderHistoryProps> = ({
   orders,
   isLoading = false,
-  onViewDetails,
 }) => {
   if (isLoading) {
     return <div className="loading">Loading orders...</div>;
@@ -44,7 +43,11 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({
         <tbody>
           {orders.map((order) => (
             <tr key={order.id}>
-              <td className="order-id">#{order.id}</td>
+              <td className="order-id">
+                <Link className="order-id-link" to={`/orders/${order.id}`}>
+                  {order.id}
+                </Link>
+              </td>
               <td>{new Date(order.orderDate).toLocaleDateString()}</td>
               <td>${order.totalAmount.toFixed(2)}</td>
               <td>
@@ -52,14 +55,9 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({
               </td>
               <td>{order.items.length} item(s)</td>
               <td>
-                {onViewDetails && (
-                  <button
-                    onClick={() => onViewDetails(order)}
-                    className="btn-view"
-                  >
-                    View Details
-                  </button>
-                )}
+                <Link className="order-action-link" to={`/orders/${order.id}`}>
+                  View Details
+                </Link>
               </td>
             </tr>
           ))}

@@ -14,14 +14,21 @@ export const productApi = {
       // 💡 Try changing "search" to "q" or "name" if "search" doesn't work
       if (filters.searchTerm) queryParams.search = filters.searchTerm;
       if (filters.category) queryParams.category = filters.category;
-      if (filters.minPrice !== undefined) queryParams.minPrice = filters.minPrice;
-      if (filters.maxPrice !== undefined) queryParams.maxPrice = filters.maxPrice;
+      if (filters.minPrice !== undefined)
+        queryParams.minPrice = filters.minPrice;
+      if (filters.maxPrice !== undefined)
+        queryParams.maxPrice = filters.maxPrice;
     }
     const res = await axiosClient.get("/products", {
       params: filters,
     });
 
     return res.data.items || res.data;
+  },
+
+  async getById(id: string): Promise<Product> {
+    const res = await axiosClient.get<Product>(`/products/${id}`);
+    return res.data;
   },
 
   // ✅ ADD THIS

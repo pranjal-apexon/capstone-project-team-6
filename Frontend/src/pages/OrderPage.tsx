@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../store/store";
 import { orderApi } from "../api/orderApi";
+import Breadcrumbs from "../components/Layout/Breadcrumbs";
 import OrderHistory from "../components/Orders/OrderHistory"; // Import your component
 import type { Order } from "../types/order.types"; // Import your type
 import "../components/styles/orders.css";
@@ -46,6 +47,8 @@ const OrderPage: React.FC = () => {
 
   return (
     <div className="page-container order-page">
+      <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "Orders" }]} />
+
       <header className="order-page-header">
         <h1>{user?.isAdmin ? "All System Orders" : "My Order History"}</h1>
       </header>

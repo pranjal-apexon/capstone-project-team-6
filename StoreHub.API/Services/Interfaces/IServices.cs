@@ -20,6 +20,7 @@ public interface IProductService
 public interface IOrderService
 {
     Task<OrderDto> CreateAsync(int userId, CreateOrderDto dto);
+    Task<OrderDto> GetByIdAsync(int orderId, int requestingUserId, bool isAdmin);
     Task<List<OrderDto>> GetMyOrdersAsync(int userId);
     Task<List<OrderDto>> GetAllOrdersAsync();
     Task<OrderDto> UpdateStatusAsync(int orderId, UpdateOrderStatusDto dto, int requestingUserId, bool isAdmin);

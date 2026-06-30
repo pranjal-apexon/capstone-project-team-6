@@ -166,6 +166,16 @@
   font-size: 12px;
 }
 
+.order-id-link {
+  color: #666;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.order-id-link:hover {
+  color: #2563eb;
+}
+
 .status-badge {
   display: inline-block;
   padding: 6px 12px;
@@ -178,6 +188,23 @@
 .status-pending {
   background-color: #fff3cd;
   color: #856404;
+}
+
+.order-action-link {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  background-color: #dbeafe;
+  color: #1e40af;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.order-action-link:hover {
+  background-color: #bfdbfe;
+  color: #1e3a8a;
 }
 
 .status-processing {
@@ -290,6 +317,92 @@
 
 .tab-content {
   animation: fadeIn 0.3s;
+}
+
+.order-details-container {
+  max-width: 980px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.order-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.order-details-title {
+  margin: 0;
+  color: #0f172a;
+}
+
+.btn-back {
+  background-color: #dbeafe;
+  color: #1e40af;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-back:hover {
+  background-color: #bfdbfe;
+  color: #1e3a8a;
+}
+
+.order-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.details-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 18px;
+}
+
+.details-card h3 {
+  margin: 0 0 12px;
+  color: #0f172a;
+}
+
+.details-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.details-row:last-child {
+  border-bottom: none;
+}
+
+.details-label {
+  color: #64748b;
+  font-weight: 600;
+}
+
+.details-value {
+  color: #0f172a;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .order-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .order-details-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 @keyframes fadeIn {

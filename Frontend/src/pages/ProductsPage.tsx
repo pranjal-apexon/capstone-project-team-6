@@ -1,17 +1,25 @@
-import React, { useEffect, useState } from 'react'; // Added useState
-import { useDispatch, useSelector } from 'react-redux';
-import type { RootState, AppDispatch } from '../store/store';
-import { setLoading, setError, setProducts, setFilters } from '../store/productSlice';
-import { addToCart } from '../store/cartSlice';
-import ProductList from '../components/Products/ProductList';
-import ProductSearch from '../components/Products/ProductSearch';
-import type { Product, ProductFilters } from '../types/product.types';
-import productApi from '../api/productApi';
-import '../components/styles/products.css';
+import React, { useEffect, useState } from "react"; // Added useState
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "../store/store";
+import {
+  setLoading,
+  setError,
+  setProducts,
+  setFilters,
+} from "../store/productSlice";
+import { addToCart } from "../store/cartSlice";
+import ProductList from "../components/Products/ProductList";
+import ProductSearch from "../components/Products/ProductSearch";
+import Breadcrumbs from "../components/Layout/Breadcrumbs";
+import type { Product, ProductFilters } from "../types/product.types";
+import productApi from "../api/productApi";
+import "../components/styles/products.css";
 
 const ProductsPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { products, isLoading, error, filters } = useSelector((state: RootState) => state.product);
+  const { products, isLoading, error, filters } = useSelector(
+    (state: RootState) => state.product,
+  );
 
   // 🟢 State to manage the active toast message
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -38,7 +46,8 @@ const ProductsPage: React.FC = () => {
       const data = await productApi.getAll();
       dispatch(setProducts(data));
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Failed to load products';
+      const errorMessage =
+        err.response?.data?.message || "Failed to load products";
       dispatch(setError(errorMessage));
     } finally {
       dispatch(setLoading(false));
@@ -49,7 +58,7 @@ const ProductsPage: React.FC = () => {
     dispatch(setFilters(newFilters));
   };
 
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = (product: Product, quantity: number) => {
     dispatch(
       addToCart({
         productId: product.id,
@@ -59,12 +68,12 @@ const ProductsPage: React.FC = () => {
           price: product.price,
           stockQuantity: product.stockQuantity,
         },
-        quantity: 1,
-      })
+        quantity,
+      }),
     );
 
     // 🟢 Replace alert with custom toast trigger
-    setToastMessage(`${product.name} added to cart!`);
+    setToastMessage(`${quantity} x ${product.name} added to cart!`);
   };
 
   // CLIENT-SIDE FILTERING LOGIC
@@ -72,7 +81,9 @@ const ProductsPage: React.FC = () => {
     if (filters?.searchTerm) {
       const term = filters.searchTerm.toLowerCase();
       const matchesName = product.name?.toLowerCase().includes(term);
-      const matchesDescription = product.description?.toLowerCase().includes(term);
+      const matchesDescription = product.description
+        ?.toLowerCase()
+        .includes(term);
 
       if (!matchesName && !matchesDescription) {
         return false;
@@ -96,6 +107,10 @@ const ProductsPage: React.FC = () => {
 
   return (
     <div className="page-container products-page">
+      <Breadcrumbs
+        items={[{ label: "Home", to: "/" }, { label: "Products" }]}
+      />
+
       <h1 className="products-main-title">Our Products</h1>
       <p className="products-count-subtitle">
         {filteredProducts.length} of {(products || []).length} products
@@ -116,7 +131,12 @@ const ProductsPage: React.FC = () => {
         <div className="custom-toast">
           <span className="toast-icon">✓</span>
           <span className="toast-text">{toastMessage}</span>
-          <button className="toast-close-btn" onClick={() => setToastMessage(null)}>×</button>
+          <button
+            className="toast-close-btn"
+            onClick={() => setToastMessage(null)}
+          >
+            ×
+          </button>
         </div>
       )}
     </div>
